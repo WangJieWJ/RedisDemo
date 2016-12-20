@@ -1,6 +1,7 @@
 package com.wj.RedisDemo3;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Set;
 public class RedisTest {
 
     public static void main(String[] args) {
-        redisMap();
+        redisTx();
     }
 
     /**
@@ -114,6 +115,45 @@ public class RedisTest {
             System.out.println(s);
         }
         jedis.disconnect();
+    }
+
+    /**
+     * 自增操作
+     */
+    public static void autoChange(){
+        String host="127.0.0.1";
+        int port=6379;
+        Jedis jedis=new Jedis(host,port);
+        jedis.set("amount",100+"");
+        System.out.println(jedis.get("amount"));
+        jedis.incr("amount");
+        System.out.println(jedis.get("amount"));
+        jedis.decr("amount");
+        System.out.println(jedis.get("amount"));
+        jedis.incrBy("amount",-120);
+        System.out.println(jedis.get("amount"));
+        jedis.disconnect();
+    }
+
+    public static void redisTx(){
+        try{
+            String host="127.0.0.1";
+            int port=6379;
+            Jedis jedis=new Jedis(host,port);
+            Transaction tx=jedis.multi();
+            for(int i=0;i<10;i++){
+                tx.set("key"+i,"value"+i);
+                System.out.println("------------key"+i);
+                Thread.sleep(1000);
+            }
+            List<Object> results=tx.exec();
+            System.out.println(jedis.get("key1"));
+            for(Object s:results){
+                System.out.println(s);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
