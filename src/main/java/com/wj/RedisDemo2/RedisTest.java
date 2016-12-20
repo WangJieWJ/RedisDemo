@@ -1,4 +1,4 @@
-package com.wj.RedisDemo;
+package com.wj.RedisDemo2;
 
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * 使用连接池+分布式
  * Created by wangjie on 2016/12/20 0020.
  */
 public class RedisTest {
 
     public static void main(String[] args){
-        //使用链接池+分布式
         //生成多级连接信息列表
         List<JedisShardInfo> shards=new ArrayList<JedisShardInfo>();
         shards.add(new JedisShardInfo("127.0.0.1",6379));
