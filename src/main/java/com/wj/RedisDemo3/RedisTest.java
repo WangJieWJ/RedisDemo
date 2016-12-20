@@ -2,7 +2,10 @@ package com.wj.RedisDemo3;
 
 import redis.clients.jedis.Jedis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by wangjie on 2016/12/20 0020.
@@ -10,14 +13,13 @@ import java.util.List;
 public class RedisTest {
 
     public static void main(String[] args) {
-
-        delKeysLike();
+        redisMap();
     }
 
     /**
-     * 删除模糊匹配的Key
+     * 对List集合的操作
      */
-    public static void delKeysLike(){
+    public static void redisList(){
         String host = "127.0.0.1";
         int port = 6379;
         Jedis jedis = new Jedis(host, port);
@@ -54,6 +56,63 @@ public class RedisTest {
 
         System.out.println(jedis.exists("userList"));
 
+        jedis.disconnect();
+    }
+
+    /**
+     * 对Set集合的操作
+     */
+    public static void redisSet(){
+        String host="127.0.0.1";
+        int port=6379;
+        Jedis jedis=new Jedis(host,port);
+        jedis.sadd("food","bread","milk");
+        jedis.sadd("fruit","apple","orange","bread");
+        Set<String> fruitFood=jedis.sdiff("food","fruit");
+        for(String s: fruitFood){
+            System.out.println(s);
+        }
+        jedis.disconnect();
+    }
+
+    /**
+     * LinkedHashSet的操作
+     */
+    public static void redisZset(){
+        String host="127.0.0.1";
+        int port=6379;
+        Jedis jedis=new Jedis(host,port);
+        jedis.zadd("user",23,"WangJie");
+        jedis.zadd("user",288,"WangJie");
+        jedis.zadd("user",56,"WJ");
+        jedis.zadd("user",56,"WJ2");
+        jedis.zadd("user",56,"WJ4");
+        jedis.zadd("user",5,"WJ");
+        Set<String> set=jedis.zrange("user",0,-1);
+        for(String s:set){
+            System.out.println(s);
+        }
+        jedis.disconnect();
+    }
+
+    /**
+     * 对Map集合的操作
+     */
+    public static void redisMap(){
+        String host="127.0.0.1";
+        int port=6379;
+        Jedis jedis=new Jedis(host,port);
+
+        Map<String,String> capital=new HashMap<String,String>();
+        capital.put("shanXi","xiAn");
+        capital.put("shanDong","jiNan");
+        capital.put("beiJing","beiJing");
+        capital.put("heBei","shiJiaZhuang");
+        jedis.hmset("capital",capital);
+        List<String> cities=jedis.hmget("capital","shanDong","beiJing");
+        for(String s:cities){
+            System.out.println(s);
+        }
         jedis.disconnect();
     }
 

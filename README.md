@@ -3,15 +3,17 @@ redis是一个著名的key-value存储系统，而作为其官方推荐的Java�
 
 # Jedis常见操作 主要包括常用的列表(list)、集合(set)、有序集合(sorted set)、哈希表(hash)等结构，以及其他特性支持。
 ## 1、使用List：使用列表来模拟队列(queue)、堆栈(stack)，并且支持双向的操作(L或者R)。
-### 1、右边入队、右边出队：
+### 1、右边入队、右边出队,可同时存储多个：
 ```java
 jedis.rpush("userList","value");
+jedis.rpush("userList","value1","value2");
 jedis.rpop("userList");
 ```
 
 ### 2、左边入队、左边出队
 ```java
 jedis.lpush("userList","value");
+jedis.lpush("userList","value1","value2");
 jedis.lpop("userList");
 ```
 
@@ -71,5 +73,43 @@ Boolean isMember=jedis.sismember("fruit","pear");
 ```java
 jedis.sadd("food","bread","milk");
 Set<String> fruitFood=jedis.sunion("fruit","food");
+Set<String> fruit_food=jedis.sdiff("fruit","food");   //此表达式中使用的sdiff表示的是，第一个Set集合(fruit)中含有而在第二个Set集合(food)中不存在的元素。
+                                                      //如果想获取两个Set集合中独有的元素时，就可以两次使用sdiff。在对生成的两个集合求并即可。
 ```
 
+## 3、使用sorted set：有序集合在集合的基础上，增加一个排序的参数。
+### 1、有序集合：根据"第二个参数"进行排序。
+```java
+jedis.zadd("user",22,"James");
+```
+
+### 2、再次添加：元素相同时，更新为当前的权重。
+```java
+jedis.zadd("user",24,"James");   //此时James的权重为24
+```
+
+### 3、zset的范围：找到从0到-1(-1表示最后一位。)的所有元素。
+```java
+Set<String> user=jedis.zrange("user",0,-1);   //表示全部元素，当不知道集合中元素的多少的时候，可以使用-1来表示最后一位。
+```
+
+### 4、实际上此处的排序集合的类型是LinkedHashSet。
+
+## 4、使用Map
+### 1、保存Map数据
+```java
+Map<String,String> capital=new HashMap<String,String>();
+capital.put("shanXi",xiAn);
+capital.put("shanDong","jiNan");
+capital.put("beiJing","beiJing");
+capital.put("heBei","shiJiaZhuang");
+jedis.hmset("capitail",capital);
+```
+
+### 2、获取数据
+```java
+List<String> cities = jedis.hmget("capital", "shannxi", "shanghai");
+```
+
+//学习位置
+http://hello-nick-xu.iteye.com/blog/2077243?utm_source=tuicool&utm_medium=referral
