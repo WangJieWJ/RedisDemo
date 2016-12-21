@@ -1,4 +1,43 @@
 # RedisDemo
+
+# Redis简介
+## NOSQL简介
+```
+NoSQL是Not-Only-SQL的缩写，是被设计用来替换传统的关系型数据库在某些领域使用，特别针对web2.0站点以及大型的SNS网站，用来满足高并发、大数据的应用需求。
+常见的NoSQL数据库系统有HBase(Hadoop数据库，基于列存储)、MonGDB(文档型数据库，采用类型与JSON的BSON语法存储记录)、Redis/Memcached(键值存储数据库)等类型。
+```
+
+## Redis介绍
+```
+Redis是NoSQLogic系统数据库中，和Memcached最为相似的数据库系统，同属键值存储系统。严格意义上来讲，Memcached并不能算作数据库系统，只能算作中间缓存系统，
+因为其并不能进行数据的持久化存储。Redis的字面意思是：远程字典服务器(REmote DIctionary Server)，和Memcached相比较，提供了更加丰富的数据类型微笑，更被认为是一种数据结构服器。
+```
+
+## Redis、memcached比较
+```
+和Memcached相比，Redis的优势十分明显。
+1. 数据类型：Redis支持更丰富的数据类型，包括字符串(string)、列表(list：可用作队列、堆栈)、集合(set：可以进行集合的运算)、有序集合(sorted set)、哈希表(hash)等，而Memcached仅支持字符串。
+2. 对象大小：Redis支持的对象大小最大支持1GB，而Memcached仅为1MB，仅从这个角度来讲，就很有使用Redis替换Memcached的必要。
+3. 分片(Sharding)：可以将数据离散地存储在不同的物理机器上，以克服单台机器的内存大小限制。Memcached是在服务器实现实现分片的，而Redis需要借助于Jedis实现客户端分片，Jedis是Redis官方推荐的使用Java访问Redis的方式。
+   使用Jedis的分片机制，存储一批数据，在不同的Redis服务器上存储着这批数据的不同部分.而这对客户端来说，而完全透明的，看不到这种差别。另外需要注意，使用Spring Data Redis进行客户端操作时，不提供对分片支持。
+4. 持久化：Redis能够将添加到内存中的数据持久化到磁盘，而Memcached则只能充当一个功能相对有限的缓存中间件角色。
+```
+
+## 应用场景
+```
+    1. 数据库服务器：用来存储结构相对简单的的数据。
+    2. 缓存系统：缓存需要大量读取、少量修改的数据。
+    3. 构建实时消息系统：利用发布(Pub)/订阅(Sub)特性。
+    4. 对队列的支持：基于列表(list)实现队列(queue)、堆栈(stack)。
+```
+
+# 常见操作命令
+Redis提供了丰富的命令，
+
+http://hello-nick-xu.iteye.com/blog/2076031
+
+
+
 redis是一个著名的key-value存储系统，而作为其官方推荐的Java客户端Jedis页非常强大和稳定，支持事物、管道及有Jedis自身实现的分布式。
 
 # Jedis常见操作 主要包括常用的列表(list)、集合(set)、有序集合(sorted set)、哈希表(hash)等结构，以及其他特性支持。
