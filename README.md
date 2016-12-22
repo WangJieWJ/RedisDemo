@@ -257,8 +257,8 @@ save 60 1000
 ```
 
 ### 2、文件追加(aof)：append-only-file模式
-### @Redis会将每个接收到的“写命令”通过write函数追加到appendonly.aof文件，重启Redis时通过该文件重建整个数据库。
-### @由于os内核会缓存write函数所做的“修改”，可以使用fsync函数指定写入到磁盘的方式。
+1. Redis会将每个接收到的“写命令”通过write函数追加到appendonly.aof文件，重启Redis时通过该文件重建整个数据库。
+2. 由于os内核会缓存write函数所做的“修改”，可以使用fsync函数指定写入到磁盘的方式。
 ```shell
 appendonly yes          #启动aof持久化方式
 
@@ -280,9 +280,105 @@ appendfsync no          #依赖于os，不指定写入时机
 3. 说明：如果仅对Slave进行持久化设置，重启时，Slave自动和Master进行同步，全部数据丢失
 
 
-初识Jedis
-http://hello-nick-xu.iteye.com/blog/2076890
+# 初识Jedis
+使用Jedis提供的Java API对Redis进行操作，是Redis官方推崇的方式；并且Jedis提供的对Redis的支持也是最为灵活、全面；不足之处，就是编码复杂度较高。
 
+## 入门使用
+
++ 方式1：下载Jedis的依赖包jedis-2.1.0.jar，然后将其添加到classpath下面
++ 方式2：使用Maven添加依赖，如下
+```xml
+<dependency>
+     <groupId>redis.clients</groupId>
+     <artifactId>jedis</artifactId>
+     <version>2.9.0</version>
+     <type>jar</type>
+     <scope>compile</scope>
+</dependency>
+```
+
+### 1、定义连接：Redis暂时不要设置登录密码
+```java
+Jedis jedis = new Jedis("192.168.142.12");
+```
+
+### 2、进行键值存储
+```java
+jedis.set("country","China");
+```
+
+### 3、获取value值
+```java
+String country = jedis.get("country");
+```
+
+### 4、删除key
+```java
+jedis.del("country");
+```
+
+## 使用连接池
+
+### 1、添加依赖包commons-pool.jar，注意不要选择高版本，以免不必要的错误。
+```xml
+<dependency>
+     <groupId>org.apache.commons</groupId>
+     <artifactId>commons-pool2</artifactId>
+     <version>2.2</version>
+</dependency>
+```
+### 2、配置属性文件：redis.properties
+```properties
+redis.host=192.168.142.12       #Redis服务器地址
+redis.port=6379                 #服务端口
+redis.timeout=3000              #超时时间：单位ms
+redis.password=WangJie          #授权密码
+
+redis.pool.maxActive=200        #最大连接数：能够同时建立的“最大链接个数”
+redis.pool.maxIdle=20           #最大空闲数：空闲链接数大于maxIdle时，将进行回收
+redis.pool.minIdle=5            #最小空闲数：低于minIdle时，将创建新的链接
+redis.pool.maxWait=3000         #最大等待时间：单位ms
+
+redis.pool.testOnBorrow=true    #使用连接时，检测连接是否成功
+redis.pool.testOnReturn=true    #返回连接时，检测连接是否成功
+```
+### 3、加载属性文件：redis.properties
+```java
+ResourceBundle bundle=ResourceBundle.getBundle("redis");
+```
+### 4、创建配置对象
+```java
+JedisPoolConfig config = new JedisPoolConfig();
+String host = bundle.getString("redis.host");
+...
+config.setMaxActive(Integer.valueOf(bundle.getString("redis.pool.maxActive")));
+...
+config.setTestOnBorrow(Boolean.valueOf(bundle.getString("redis.pool.testOnBorrow")));
+...
+```
+### 5、创建Jedis连接池
+```java
+JedisPool pool = new JedisPool(config, host, port, timeout, password);
+```
+
+## 使用方式
+
+### 1、从连接池获取Jedis对象
+```java
+Jedis jedis = pool.getResource();
+```
+
+### 2、基本操作
+```java
+jedis.set("province", "shannxi");
+String province = jedis.get("province");
+jedis.del("province");
+```
+
+### 3、将Jedis对象归还给连接池
+```java
+pool.returnResource(jedis);
+```
 
 redis是一个著名的key-value存储系统，而作为其官方推荐的Java客户端Jedis页非常强大和稳定，支持事物、管道及有Jedis自身实现的分布式。
 
