@@ -592,7 +592,56 @@ List<Object> results=tx.exec();
 ```
 
 
+## Redis常用配置
 
+### 设置maxmemory(最大内存使用量)
+
++ 设置maxmemory
+maxmemory是为了限定Redis最大内存使用量。有多种方法设定他的大小。其中一种方法是通过CONFIG SET设定，如下：
+```
+127.0.0.1:6379> CONFIG get maxmemory
+1) "maxmemory"
+2) "0"
+127.0.0.1:6379> CONFIG get maxmemory-policy
+1) "maxmemory-policy"
+2) "noeviction"
+```
+另一种方法是修改配置文件redis.conf
+```
+maxmemory 100mb
+```
+注意，在64bit系统下，maxmemory设置为0表示不限追Redis内存使用，在32bit系统下，maxmemory隐式不能超过3GB
+当Redis内存使用达到指定的限制时，就需要选择一个置换的策略。
+
++ 置换策略
+当Redis内存使用达到maxmemory时，需要选择设置好的maxmemory-policy进行对老数据的置换
+下面是可以选择的置换策略：
+```
+noeviction：不进行置换，表示即使内存达到上限也不进行置换，所有能引起内存增加的命令都会返回error
+allkeys-lru：优先删除掉最近最不经常使用的key，用以保存新数据
+volatile-lru：只从设置失效(expire set)的key中选择最近最不经常使用的key进行删除，用以保存新数据
+allkeys-random：随机从all-keys中选择一些key进行删除，用以保存新数据
+volatile-random：只从设置失效(expire set)的key中，选择一些key进行删除，用以保存新数据
+volatile-ttl：只从设置失效(expire set)的key中，选出存活时间(TTL)最短的key进行删除，用以保存新数据
+```
+设置maxmemory-policy的方法和设置maxmemory方法类似，通过redis.conf或者通过CONFIG SET动态修改。
+
+如果没有匹配到可以删除的key，那么volatile-lru、volatile-random和volatile-ttl策略和noeviction替换策略一样，不对任何key进行替换。
+
+选择合适的置换策略是很重要的，这主要取决于你的应用的访问模式，当然你也以动态的修改置换策略，并通过用Redis命令，
+INFO去输出cache的命中率情况，进而可以对置换策略进行调优。
+
+一般来说，有这样一些常用的经验：
+```
+在所有的key都是最近最经常使用，那么就需要选择allkeys-lru进行置换最近最不经常使用的key，如果你不确定使用
+哪种策略，那么推荐使用allkeys-lru
+如果所有的key的访问概率都是差不多的，那么可以选用allkeys-random策略去置换数据
+如果对数据有足够的了解，能够为可以指定hint(通过expire/ttl指定)，那么可以选择volatile-ttl进行置换
+```
+
+volatile-lru和volatile-random经常在一个Redis实例既做cache又做持久化的情况下用到，然而，最好的选择是使用两个Redis实例来解决这个问题。
+
+设置是失效时间expire会占用一些内存，而采用allkeys-lru就没有必要设置失效时间，进而更有效的利用内存。
 
 //学习地址
 http://hello-nick-xu.iteye.com/blog/2075670
