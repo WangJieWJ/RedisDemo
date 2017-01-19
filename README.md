@@ -1,5 +1,13 @@
 # RedisDemo
 
+# Redis启动
+```
+Windows环境中的Redis的启动与测试
+1、先启动Redis-server(redis安装目录下的redis-server.exe)
+2、再启动Redis-cli客户端(redis-cli.exe)
+3、就可以连接Redis服务器了(一般是6379端口)
+```
+
 # Redis简介
 ## NOSQL简介
 ```
@@ -584,6 +592,18 @@ List<Object> results=tx.exec();
 ```
 
 
+
+
 //学习地址
 http://hello-nick-xu.iteye.com/blog/2075670
 http://hello-nick-xu.iteye.com/blog/2077243?utm_source=tuicool&utm_medium=referral
+
+
+CAP理论
+C：一致性
+A：可用性
+P：分区可用性
+
+
+学习地址：
+https://cnodejs.org/topic/55210d88c4f5240812f55408
