@@ -26,7 +26,6 @@ public class RedisTest {
         //执行get指令
         String data=client.get("temp");
         System.out.println("修改之前："+data);
-
         //执行set指令
         String result=client.set("temp","修改temp的值");
         System.out.println("执行结果："+result);
