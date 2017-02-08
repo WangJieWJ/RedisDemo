@@ -594,6 +594,18 @@ List<Object> results=tx.exec();
 
 ## Redis常用配置
 
+### Redis开启远程登录连接
+```
+原来是redis默认只能localhost登录，所以需要开启远程登录。解决方法如下：
+在Redis的配置文件中redis.windows.conf中，找到bind lcoalhost注释掉。
+注释掉本机，局域网内的所有的计算机都能访问。
+bind localhost只能本机访问，局域网内计算机都不等访问
+bind 局域网IP 只能局域网内IP的机器访问，本地localhost都无法访问。
+
+2、一定要配置防火墙  开放端口6379
+3、redis配置认证密码    可在redis.windows.conf中来配置  requirepass即可,去掉行前的注释，并修改密码为所需的密码,保存文件
+```
+
 ### 设置maxmemory(最大内存使用量)
 
 + 设置maxmemory

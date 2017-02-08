@@ -14,7 +14,7 @@ import java.util.Set;
 public class RedisTest {
 
     public static void main(String[] args) {
-        redisTx();
+        redisSet();
     }
 
     /**
@@ -178,9 +178,15 @@ public class RedisTest {
             exist = jedis.exists("WJ_LOCK");
             System.out.println("存在！！！" + exist);
         }
+        //
         //定义结束时间。
         Long end = System.currentTimeMillis();
         System.out.println("Key失效" + exist + (end - start) / 1000.0);
         jedis.close();
+    }
+
+    public void Hello(String[] args){
+        String Str="12404313WJasfda404sdWJsadfdf102";
+        Str.indexOf("404");
     }
 }
